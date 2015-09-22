@@ -27,8 +27,14 @@ vector<string> tokenize(string input, string delim){
 int main(int argc, char **argv){
 	string input;	
 	string token_groups[25];
+	bool testing = false;
+	if(argv[1] != NULL){
+		testing = string(argv[1]).compare("-t") == 0;		
+	}
 	while(!feof(stdin)){
-		cout << ">";
+		if(!testing){
+			cout << ">";
+		}
 		getline(cin, input);
 		if(input.size() > 100)
 		{
@@ -39,9 +45,9 @@ int main(int argc, char **argv){
 			int i = 0;
 			for(i; i < token_groups.size(); i++)
 			{
-				cout << token_groups[i] << endl;
+				cout << token_groups[i];
 			}
-
+			cout << endl;
 
 		}
 	}

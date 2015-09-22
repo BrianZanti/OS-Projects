@@ -1,4 +1,3 @@
-
 /usr/bin/emacs
 /usr/bin/emacs|
 /usr/bin/emacs |
