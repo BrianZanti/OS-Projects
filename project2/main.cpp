@@ -24,10 +24,10 @@ vector<string> tokenize(string input, string delim){
 	return token_groups;
 }
 
-int main(){
+int main(int argc, char **argv){
 	string input;	
 	string token_groups[25];
-	while(1){
+	while(!feof(stdin)){
 		cout << ">";
 		getline(cin, input);
 		if(input.size() > 100)
