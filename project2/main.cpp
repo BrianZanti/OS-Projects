@@ -20,7 +20,21 @@ vector<string> tokenize(string input, string delim){
 	return token_groups;
 }
 
-bool validate_token_group(string token_group) {
+bool validate_token(string token_group) {
+	int i = 0;
+	for(i; i < token_group.size(); i++) {
+		if(! isalnum(token_group[i])) {
+			if(token_group[i] == '.'
+				|| token_group[i] == '-' 
+				|| token_group[i] == '/' 
+				|| token_group[i] == '_') {
+			}
+			else{ 
+				return false;
+			}
+		}
+		
+	}
 	return true;
 }
 
@@ -46,17 +60,26 @@ int main(int argc, char **argv){
 				break;
 			}
 			vector<string> token_groups = tokenize(input, " | ");
-			char *args[] = {"ls",NULL};
-			execvp("ls",token_groups);
+			vector<vector<string> > commands;			
 			int i = 0;
 			bool valid = true;
 			for(i; i < token_groups.size(); i++)
-			{
-				
-				if( !(validate_token_group(token_groups[i])) ){
-					valid = false;
+			{				
+				vector<string> command = tokenize(token_groups[i], " ");
+				commands.push_back(command);
+				int j = 0;
+				for(j; j < command.size(); j++)
+				{			
+					if( !(validate_token(command[j]))){						
+						if(token_groups.size() != 1 || (command[j].compare(">") != 0 && command[j].compare("<")))
+						{
+							cout << "here" << endl;
+							valid = false;
+						}
+					}					
 				}
 			}
+
 			if(valid) {
 				if(testing){			
 					cout << input << " is a valid statement" << endl;	
