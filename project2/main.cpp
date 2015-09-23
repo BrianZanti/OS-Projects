@@ -20,8 +20,7 @@ vector<string> tokenize(string input, string delim){
 	return token_groups;
 }
 
-bool validate(string token_group) {
-	bool validchar = true;
+bool validate_token(string token_group) {
 	int i = 0;
 	for(i; i < token_group.size(); i++) {
 		if(! isalnum(token_group[i])) {
@@ -38,32 +37,49 @@ bool validate(string token_group) {
 	}
 	return true;
 }
+
 int main(int argc, char **argv){
 	string input;	
 	string token_groups[25];
 	bool testing = false;
 	if(argv[1] != NULL){
 		testing = string(argv[1]).compare("-t") == 0;		
-	}
-	if(!testing){
-		cout << ">";
-	}		
-	while( getline(cin, input) ){
+	}	
+	while(1){
+		if(!testing){
+			cout << ">";
+		}	
+		getline(cin, input);
 		if(input.size() > 100)
 		{
 			cout << "Error: cannot read lines of greater than 100 characters." << endl;
 		}
 		else{
+			if(input.compare("exit") == 0 || input.compare("") == 0)
+			{
+				break;
+			}
 			vector<string> token_groups = tokenize(input, " | ");
+			vector<vector<string> > commands;			
 			int i = 0;
 			bool valid = true;
 			for(i; i < token_groups.size(); i++)
-			{
-				//cout << token_groups[i] << endl;
-				if( ! (validate(token_groups[i])) ){
-					valid = false;
+			{				
+				vector<string> command = tokenize(token_groups[i], " ");
+				commands.push_back(command);
+				int j = 0;
+				for(j; j < command.size(); j++)
+				{			
+					if( !(validate_token(command[j]))){						
+						if(token_groups.size() != 1 || (command[j].compare(">") != 0 && command[j].compare("<")))
+						{
+							cout << "here" << endl;
+							valid = false;
+						}
+					}					
 				}
 			}
+
 			if(valid) {
 				if(testing){			
 					cout << input << " is a valid statement" << endl;	
@@ -77,9 +93,6 @@ int main(int argc, char **argv){
 			
 
 		}
-		if(!testing){
-			cout << ">";
-		}		
 	}
 	return 0;
 }
