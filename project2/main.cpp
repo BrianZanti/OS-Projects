@@ -43,7 +43,17 @@ void handle_redirects(vector<vector<string> > commands) {
 }
 
 void handle_pipes(vector<vector<string> > commands) {
-
+	int i = 0;
+	for(i; i < commands.size(); i++)
+	{
+			int j = 0;
+		for(j; j < commands[i].size(); j++)
+		{
+			cout << commands[i][j];
+		}
+		cout << endl;
+	}
+	
 }
 
 int main(int argc, char **argv){
@@ -122,6 +132,7 @@ int main(int argc, char **argv){
 			if(valid) {
 				if(testing){			
 					cout << input << " is a valid statement" << endl;	
+
 				}
 				if(commands.size() > 1){
 					handle_pipes(commands);
