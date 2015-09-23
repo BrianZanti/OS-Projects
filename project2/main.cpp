@@ -50,6 +50,17 @@ int main(int argc, char **argv){
 					valid = false;
 				}
 			}
+			if(valid) {
+				if(testing){			
+					cout << input << " is a valid statement" << endl;	
+				}
+			}
+			else {
+				if(testing){	
+					cout << input << " is an invalid statement" << endl;	
+				}
+			}
+			
 
 		}
 		if(!testing){
