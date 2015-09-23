@@ -2,6 +2,9 @@
 #include <iostream>
 #include <stdio.h>
 #include <vector>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 using namespace std;
 
@@ -38,7 +41,44 @@ bool validate_token(string token_group) {
 	return true;
 }
 
-void handle_redirects(vector<vector<string> > commands) {
+void handle_redirects(vector<string> commands) {
+	int in, out;
+	int i = 0;
+	string inputfile, outputfile;
+
+
+	for(i; i < commands.size(); i++) {
+		if(commands[i].compare("<") == 0){
+			inputfile = commands[i+1];
+			cout << inputfile << "is input file" << endl;
+
+		}
+		if(commands[i].compare(">") == 0){
+			outputfile = commands[i+1];
+			cout << outputfile << "is output file" << endl;
+
+		}
+	}
+	in = open(&inputfile[0], O_RDONLY);
+	out = open(&outputfile[0], O_WRONLY);
+
+	dup2(in, 0);
+
+	dup2(out, 1);
+
+	close(in);
+	close(out);
+
+	char * arg0 = &commands[0][0];
+	char ** args;
+	i = 0;
+	for(i;i < commands.size(); i++)
+	{
+		args[i] = &commands[i][0];
+	}
+	args[commands.size()] = NULL;	
+
+	execvp(arg0, args);
 
 }
 
@@ -127,7 +167,7 @@ int main(int argc, char **argv){
 					handle_pipes(commands);
 				}
 				else{
-					handle_redirects(commands);
+					handle_redirects(commands[0]);
 				}
 			}
 			else {
