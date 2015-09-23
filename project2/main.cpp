@@ -38,6 +38,14 @@ bool validate_token(string token_group) {
 	return true;
 }
 
+void handle_redirects(vector<vector<string> > commands) {
+
+}
+
+void handle_pipes(vector<vector<string> > commands) {
+
+}
+
 int main(int argc, char **argv){
 	string input;	
 	string token_groups[25];
@@ -63,6 +71,9 @@ int main(int argc, char **argv){
 			vector<vector<string> > commands;			
 			int i = 0;
 			bool valid = true;
+			bool hasInputRedirect = false;
+			bool hasOutputRedirect = false;
+
 			for(i; i < token_groups.size(); i++)
 			{				
 				vector<string> command = tokenize(token_groups[i], " ");
@@ -71,11 +82,39 @@ int main(int argc, char **argv){
 				for(j; j < command.size(); j++)
 				{			
 					if( !(validate_token(command[j]))){						
-						if(token_groups.size() != 1 || (command[j].compare(">") != 0 && command[j].compare("<")))
+						if(token_groups.size() != 1 || (command[j].compare(">") != 0 && command[j].compare("<") != 0))
 						{
-							cout << "here" << endl;
 							valid = false;
 						}
+						if(command[j].compare("<") == 0 )
+						{
+							if(hasInputRedirect || hasOutputRedirect || j == 0 || j != command.size() - 2)
+							{
+								if(j+2 < command.size()){
+									if(command[j+2].compare(">") != 0)
+									{
+										valid = false;
+									}
+								}
+
+							}
+							else 
+							{
+								hasInputRedirect = true;
+							}							
+						}
+						else if(command[j].compare(">") == 0)
+						{
+							if(hasOutputRedirect || j == 0 || j != command.size() - 2)
+							{		
+								valid = false;									
+							}
+							else
+							{
+								hasOutputRedirect = true;
+							}
+						}
+
 					}					
 				}
 			}
@@ -83,6 +122,12 @@ int main(int argc, char **argv){
 			if(valid) {
 				if(testing){			
 					cout << input << " is a valid statement" << endl;	
+				}
+				if(commands.size() > 1){
+					handle_pipes(commands);
+				}
+				else{
+					handle_redirects(commands);
 				}
 			}
 			else {
