@@ -21,9 +21,23 @@ vector<string> tokenize(string input, string delim){
 }
 
 bool validate(string token_group) {
+	bool validchar = true;
+	int i = 0;
+	for(i; i < token_group.size(); i++) {
+		if(! isalnum(token_group[i])) {
+			if(token_group[i] == '.'
+				|| token_group[i] == '-' 
+				|| token_group[i] == '/' 
+				|| token_group[i] == '_') {
+			}
+			else{ 
+				return false;
+			}
+		}
+		
+	}
 	return true;
 }
-
 int main(int argc, char **argv){
 	string input;	
 	string token_groups[25];
