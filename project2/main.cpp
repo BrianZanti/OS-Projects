@@ -20,7 +20,7 @@ vector<string> tokenize(string input, string delim){
 	return token_groups;
 }
 
-bool validate(string token_group) {
+bool validate_token_group(string token_group) {
 	return true;
 }
 
@@ -30,23 +30,30 @@ int main(int argc, char **argv){
 	bool testing = false;
 	if(argv[1] != NULL){
 		testing = string(argv[1]).compare("-t") == 0;		
-	}
-	if(!testing){
-		cout << ">";
-	}		
-	while( getline(cin, input) ){
+	}	
+	while(1){
+		if(!testing){
+			cout << ">";
+		}	
+		getline(cin, input);
 		if(input.size() > 100)
 		{
 			cout << "Error: cannot read lines of greater than 100 characters." << endl;
 		}
 		else{
+			if(input.compare("exit") == 0 || input.compare("") == 0)
+			{
+				break;
+			}
 			vector<string> token_groups = tokenize(input, " | ");
+			char *args[] = {"ls",NULL};
+			execvp("ls",token_groups);
 			int i = 0;
 			bool valid = true;
 			for(i; i < token_groups.size(); i++)
 			{
-				//cout << token_groups[i] << endl;
-				if( ! (validate(token_groups[i])) ){
+				
+				if( !(validate_token_group(token_groups[i])) ){
 					valid = false;
 				}
 			}
@@ -63,9 +70,6 @@ int main(int argc, char **argv){
 			
 
 		}
-		if(!testing){
-			cout << ">";
-		}		
 	}
 	return 0;
 }
