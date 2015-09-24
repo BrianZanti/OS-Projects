@@ -1,9 +1,0 @@
-exec
-a
-infile.txt
-main.cpp
-main.o
-Makefile
-outfile.txt
-shell
-test.txt
