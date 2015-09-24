@@ -87,7 +87,7 @@ void handle_redirects(vector<string> commands) {
 				cout << "Error opening file" << endl;
 				return;
 			}
-		execvp(arg0, args);
+			execvp(arg0, args);
 	}
 	else {
 		int returnStatus;
@@ -100,26 +100,101 @@ void handle_redirects(vector<string> commands) {
 }
 
 void handle_pipes(vector<vector<string> > commands) {
-/*	int i = 0;
-	for(i; i < commands.size(); i++)
+	int pipefd[commands.size()-1][2];
+	int i = 0;
+	for(i; i < commands.size()-1; i++)
 	{
-		int j = 0;
-		for(j; j < commands[i].size(); j++)
+		pipe(pipefd[i]);
+	}
+	vector<char**> commands_as_cstrings;
+	pid_t driverPid = fork();
+	if(driverPid == 0)
+	{
+		i = commands.size() - 1;
+		for(i; i >= 0; i--)
 		{
-			cout << commands[i][j];
+			cout << "i = " << i << endl;
+			char* args[commands[i].size()];
+			int j = 0;
+			int numArgs = 0;
+			for(j; j < commands[i].size(); j++)
+			{
+				args[j] = &commands[i][j][0];
+				numArgs++;
+			}
+			args[numArgs] = NULL;
+
+			pid_t pid;
+
+			
+			if(i == 0) 
+			{
+				pid = 1;
+			}
+			else
+			{
+				pid = fork();
+			}
+			if(pid != 0)
+			{	
+
+				int x = 0;
+				for(x; x < commands.size()-1; x++)
+				{
+					if(x != i && x != i-1){
+						close(pipefd[x][0]);
+						close(pipefd[x][1]);
+						//cout << "closing pipe " << x << endl;
+					}				
+				}
+
+				if(i != 0)  //handle redirection input
+				{
+					//cout << "Replacing standard input with pipe " << i - 1 <<"'s input" <<endl;
+					//cout << "Closing output of pipe " << i - 1 << endl;			
+					dup2(pipefd[i-1][0], 0);	
+					close(pipefd[i-1][1]);
+				}
+
+				if(i != commands.size()-1) //handle redirecting output
+				{
+					//cout <<"replalcing standard output with pipe "<<i << "'s output" << endl;
+					//cout << "Closing input of pipe " << i  << endl;
+					//cout << "===============================" << endl;		
+
+					dup2(pipefd[i][1], 1);
+					if(i == 0){cout << "here" << endl;}
+					close(pipefd[i][0]);
+
+				}
+
+				cout << "executing " << args[0] << endl;
+				execvp(args[0],args);
+			}
+
 		}
-		cout << endl;
-	}	*/
+	}
+	else
+	{
+		int returnStatus;
+		cout << "driver waiting..." << endl;
+		waitpid(driverPid, &returnStatus, 0);	
+		cout << "driver resuming" << endl;
+		if(returnStatus != 0)
+		{		
+			cout << "Command did not exit normally." << endl;
+		}
+	}
 }
 
-int main(int argc, char **argv){
+int main(int argc, char** argv){
 	string input;	
 	string token_groups[25];
 	bool testing = false;
 	if(argv[1] != NULL){
 		testing = string(argv[1]).compare("-t") == 0;		
 	}	
-	while(1){
+	while(1){		
 		if(!testing){
 			cout << ">";
 		}	
@@ -180,7 +255,6 @@ int main(int argc, char **argv){
 								hasOutputRedirect = true;
 							}
 						}
-
 					}					
 				}
 			}
@@ -198,9 +272,7 @@ int main(int argc, char **argv){
 				}
 			}
 			else {
-				if(testing){	
-					cout << input << " is an invalid statement" << endl;	
-				}
+				cout << "Invalid command" << endl;	
 			}
 			
 
