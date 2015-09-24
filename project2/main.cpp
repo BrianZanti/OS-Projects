@@ -99,21 +99,16 @@ void handle_redirects(vector<string> commands) {
 	}
 }
 
-void handle_pipes(vector<vector<string> > commands) {
-	int pipefd[commands.size()-1][2];
-	int i = 0;
-	for(i; i < commands.size()-1; i++)
-	{
-		pipe(pipefd[i]);
-	}
-	vector<char**> commands_as_cstrings;
+void handle_pipes(vector<vector<string> > commands) {	
 	pid_t driverPid = fork();
 	if(driverPid == 0)
 	{
-		i = commands.size() - 1;
-		for(i; i >= 0; i--)
+		int i = 0;
+		int oldfd[2];
+		int newfd[2];
+		for(i; i < commands.size(); i++)
 		{
-			cout << "i = " << i << endl;
+			pipe(newfd);
 			char* args[commands[i].size()];
 			int j = 0;
 			int numArgs = 0;
@@ -123,67 +118,51 @@ void handle_pipes(vector<vector<string> > commands) {
 				numArgs++;
 			}
 			args[numArgs] = NULL;
-
 			pid_t pid;
-
-			
-			if(i == 0) 
+			if(i == commands.size() - 1)
 			{
-				pid = 1;
+				pid = 0;
 			}
 			else
 			{
 				pid = fork();
 			}
-			if(pid != 0)
+			if(pid == 0)
 			{	
-
-				int x = 0;
-				for(x; x < commands.size()-1; x++)
-				{
-					if(x != i && x != i-1){
-						close(pipefd[x][0]);
-						close(pipefd[x][1]);
-						//cout << "closing pipe " << x << endl;
-					}				
-				}
-
 				if(i != 0)  //handle redirection input
-				{
-					//cout << "Replacing standard input with pipe " << i - 1 <<"'s input" <<endl;
-					//cout << "Closing output of pipe " << i - 1 << endl;			
-					dup2(pipefd[i-1][0], 0);	
-					close(pipefd[i-1][1]);
+				{		
+					dup2(oldfd[0], 0);	
+					close(oldfd[0]);
+					close(oldfd[1]);
 				}
-
 				if(i != commands.size()-1) //handle redirecting output
-				{
-					//cout <<"replalcing standard output with pipe "<<i << "'s output" << endl;
-					//cout << "Closing input of pipe " << i  << endl;
-					//cout << "===============================" << endl;		
-
-					dup2(pipefd[i][1], 1);
-					if(i == 0){cout << "here" << endl;}
-					close(pipefd[i][0]);
-
+				{				
+					dup2(newfd[1], 1);					
+					close(newfd[0]);
+					close(newfd[1]);
 				}
-
-				cout << "executing " << args[0] << endl;
 				execvp(args[0],args);
+			}
+			else
+			{
+				if(i != 0)
+				{
+					close(oldfd[0]);
+					close(oldfd[1]);
+				}
+				if(i != commands.size()-1)
+				{
+					oldfd[0] = newfd[0];
+					oldfd[1] = newfd[1];
+				}
 			}
 
 		}
 	}
 	else
 	{
-		int returnStatus;
-		cout << "driver waiting..." << endl;
-		waitpid(driverPid, &returnStatus, 0);	
-		cout << "driver resuming" << endl;
-		if(returnStatus != 0)
-		{		
-			cout << "Command did not exit normally." << endl;
-		}
+		int returnValue;
+		waitpid(-1, &returnValue, 0);
 	}
 }
 
