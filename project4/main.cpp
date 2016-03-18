@@ -80,8 +80,8 @@ int main(){
 	for(j; j < iterations; j++){
 		int length = pow(2,j+1);
 		int i = 0;
-		pthread_mutex_init(*(barrier.mutex), NULL);
-		pthread_cond_init(*(barrier.cond), NULL);
+		pthread_mutex_init(&(barrier.mutex), NULL);
+		pthread_cond_init(&(barrier.cond), NULL);
 		barrier.running  = total/length;
 		struct ThreadArguments args[total/length];	
 		for(i; i < total; i+=length)
